@@ -14,7 +14,7 @@ CREATE TABLE Proyectos (
     descripcion VARCHAR(200) NOT NULL,
     fecha_inicio DATE NOT NULL,
     fecha_fin DATE NOT NULL,
-    estado ENUM("Iniciacion", "Ejecucion", "Pausa", "Completada","Cancelada") NOT NULL,
+    estado ENUM("PLANIFICADO", "EN_CURSO", "FINALIZADO") NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -23,7 +23,7 @@ CREATE TABLE Empleado_Proyecto (
     proyecto_id INT NOT NULL,
     rol VARCHAR(50) NOT NULL,
     fecha_asignacion DATE NOT NULL,
-    horas_semanales INT NOT NULL,
+    horas_semanales INT NOT NULL CHECK(horas_semanales > 0 AND horas_semanales < 40),
     FOREIGN KEY (empleado_id) REFERENCES Empleados(id),
     FOREIGN KEY (proyecto_id) REFERENCES Proyectos(id)
 );
