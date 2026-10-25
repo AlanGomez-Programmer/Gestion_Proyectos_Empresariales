@@ -1,0 +1,34 @@
+package com.AlanGomez.gestion_proyectos_empresariales.utilidades;
+
+import java.util.regex.Pattern;
+
+public enum TipoTexto {
+
+    // Solo para permitir letras y no números ni simbolos (Para nombres)
+    SOLO_LETRAS(
+            "^[\\p{L} ]+$", 
+            "Solo se permiten letras"
+    ),
+    // Permite letras, signos (.,#/) y números
+    ALFANUMERICO(
+            "^[\\p{L}0-9 ..#/-]+$",
+            "Solo se permiten letras, números y los signos .,#/"
+    );
+ 
+    private final Pattern patron;
+    private final String mensajeError;
+    
+    private TipoTexto(String patron, String mensajeError){
+        this.patron = Pattern.compile(patron);
+        this.mensajeError = mensajeError;
+    }
+    
+    public boolean esValido(String texto){
+        return texto != null && patron.matcher(texto).matches();
+    }
+    
+    public String getMensajeError(){
+        return mensajeError;
+    }
+    
+}
