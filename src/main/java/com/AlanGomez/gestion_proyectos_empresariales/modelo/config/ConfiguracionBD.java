@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public record ConfiguracionBD (String url, String usuario, String password) {
+public record ConfiguracionBD (String url, String usuario, String contrasenia) {
 
     private static final String ARCHIVO_CONFIG = "db.properties";
 
