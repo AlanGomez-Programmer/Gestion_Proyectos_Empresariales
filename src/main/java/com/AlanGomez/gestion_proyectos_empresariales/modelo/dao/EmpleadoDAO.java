@@ -11,13 +11,14 @@ import java.util.List;
 public class EmpleadoDAO extends OperacionesDAO implements Mapear<ResultSet, Empleado>{
     
     public boolean crear(Empleado empleado) throws SQLException{
-        String sql = "INSERT INTO Empleados(nombre, correo) VALUES (?, ?)";
+        String sql = "INSERT INTO Empleados(nombre, correo, cargo) VALUES (?, ?, ?)";
         try (
                 Connection con = obtenerConexion();
                 PreparedStatement ps = con.prepareStatement(sql)
             ){
             ps.setString(1, empleado.getNombre());
             ps.setString(2, empleado.getCorreo());
+            ps.setString(3, empleado.getCargo());
             return ps.executeUpdate() == 1;
         }
     }
@@ -88,6 +89,18 @@ public class EmpleadoDAO extends OperacionesDAO implements Mapear<ResultSet, Emp
         }
     }
     
+    public boolean actualizarCargo(Empleado empleado) throws SQLException{
+        String sql = "UPDATE Empleados SET cargo = ? WHERE id = ?";
+        try (
+                Connection con = obtenerConexion();
+                PreparedStatement ps = con.prepareStatement(sql)
+            ){
+            ps.setString(1, empleado.getCargo());
+            ps.setInt(2, empleado.getId());
+            return ps.executeUpdate() == 1;
+        }
+    }
+
     public boolean eliminar(Empleado empleado) throws SQLException{
         String sql = "DELETE FROM Empleados WHERE id = ?";
         try (
@@ -104,7 +117,8 @@ public class EmpleadoDAO extends OperacionesDAO implements Mapear<ResultSet, Emp
         return new Empleado(
                 rs.getInt("id"),
                 rs.getString("nombre"),
-                rs.getString("correo")
+                rs.getString("correo"),
+                rs.getString("cargo")
         );
     }
 }
