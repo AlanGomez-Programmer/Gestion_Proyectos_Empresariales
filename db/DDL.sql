@@ -5,6 +5,7 @@ CREATE TABLE Empleados (
     id INT AUTO_INCREMENT,
     nombre VARCHAR(75) NOT NULL,
     correo VARCHAR(100) NOT NULL UNIQUE,
+    cargo VARCHAR(75) NOT NULL,
     PRIMARY KEY (id)
 );
 
@@ -27,4 +28,3 @@ CREATE TABLE Empleado_Proyecto (
     FOREIGN KEY (empleado_id) REFERENCES Empleados(id),
     FOREIGN KEY (proyecto_id) REFERENCES Proyectos(id)
 );
-
