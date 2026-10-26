@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/proyectos_empresariales
+db.usuario=tu_usuario
+db.contrasenia=tu_contraseña

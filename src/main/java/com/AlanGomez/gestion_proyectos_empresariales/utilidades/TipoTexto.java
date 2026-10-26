@@ -9,10 +9,15 @@ public enum TipoTexto {
             "^[\\p{L} ]+$", 
             "Solo se permiten letras"
     ),
-    // Permite letras, signos (.,#/) y números
+    // Permite letras, signos (.,#/-) y números
     ALFANUMERICO(
-            "^[\\p{L}0-9 ..#/-]+$",
-            "Solo se permiten letras, números y los signos .,#/"
+            "^[\\p{L}0-9 .,#/-]+$",
+            "Solo se permiten letras, números y los signos .,#/-"
+    ),
+    // Formato de correo: usuario@dominio.ext
+    CORREO(
+            "^[\\w.+-]+@[\\w-]+(\\.[\\w-]+)+$",
+            "El correo debe tener el formato usuario@dominio.com"
     );
  
     private final Pattern patron;
@@ -30,5 +35,4 @@ public enum TipoTexto {
     public String getMensajeError(){
         return mensajeError;
     }
-    
 }
