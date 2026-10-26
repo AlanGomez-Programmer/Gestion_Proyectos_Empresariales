@@ -15,14 +15,14 @@ public class ProyectosDAO extends OperacionesDAO implements Mapear<ResultSet, Pr
         String sql = "INSERT INTO Proyectos(nombre, descripcion, fecha_inicio, fecha_fin, estado) VALUES (?,?,?,?,?)";
         try (
                 Connection con = obtenerConexion();
-                PreparedStatement sp = con.prepareStatement(sql);
+                PreparedStatement ps = con.prepareStatement(sql)
             ){
-            sp.setString(1, proyecto.getNombre());
-            sp.setString(2, proyecto.getDescripcion());
-            sp.setObject(3, proyecto.getFechaInicio());
-            sp.setObject(4, proyecto.getFechaFin());
-            sp.setObject(5, proyecto.getEstado());
-            return sp.executeUpdate() == 1;
+            ps.setString(1, proyecto.getNombre());
+            ps.setString(2, proyecto.getDescripcion());
+            ps.setObject(3, proyecto.getFechaInicio());
+            ps.setObject(4, proyecto.getFechaFin());
+            ps.setString(5, proyecto.getEstado().name());
+            return ps.executeUpdate() == 1;
         }
     }
     
@@ -45,17 +45,19 @@ public class ProyectosDAO extends OperacionesDAO implements Mapear<ResultSet, Pr
         String sql = "SELECT * FROM Proyectos WHERE id = ?";
         try (
                 Connection con = obtenerConexion();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()
+                PreparedStatement ps = con.prepareStatement(sql)
             ){
-            if (rs.next()){
-                return mapear(rs);
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    return mapear(rs);
+                }
+                return null;
             }
-            return null;
         }
     }
     
-    public boolean actulizarTodo(Proyecto proyecto) throws SQLException{
+    public boolean actualizarTodo(Proyecto proyecto) throws SQLException{
         String sql = "UPDATE Proyectos SET nombre = ?, descripcion = ?, fecha_fin = ?, estado = ? WHERE id = ?";
         try (
                 Connection con = obtenerConexion();
@@ -64,13 +66,37 @@ public class ProyectosDAO extends OperacionesDAO implements Mapear<ResultSet, Pr
             ps.setString(1, proyecto.getNombre());
             ps.setString(2, proyecto.getDescripcion());
             ps.setObject(3, proyecto.getFechaFin());
-            ps.setObject(4, proyecto.getEstado());
+            ps.setString(4, proyecto.getEstado().name());
             ps.setInt(5, proyecto.getId());
             return ps.executeUpdate() == 1;
         }
     }
     
-    public boolean actulizarFechaFin(Proyecto proyecto) throws SQLException{
+    public boolean actualizarNombre(Proyecto proyecto) throws SQLException{
+        String sql = "UPDATE Proyectos SET nombre = ? WHERE id = ?";
+        try (
+                Connection con = obtenerConexion();
+                PreparedStatement ps = con.prepareStatement(sql)
+            ){
+            ps.setString(1, proyecto.getNombre());
+            ps.setInt(2, proyecto.getId());
+            return ps.executeUpdate() == 1;
+        }
+    }
+    
+    public boolean actualizarDescripcion(Proyecto proyecto) throws SQLException{
+        String sql = "UPDATE Proyectos SET descripcion = ? WHERE id = ?";
+        try (
+                Connection con = obtenerConexion();
+                PreparedStatement ps = con.prepareStatement(sql)
+            ){
+            ps.setString(1, proyecto.getDescripcion());
+            ps.setInt(2, proyecto.getId());
+            return ps.executeUpdate() == 1;
+        }
+    }
+    
+    public boolean actualizarFechaFin(Proyecto proyecto) throws SQLException{
         String sql = "UPDATE Proyectos SET fecha_fin = ? WHERE id = ?";
         try (
                 Connection con = obtenerConexion();
@@ -82,14 +108,14 @@ public class ProyectosDAO extends OperacionesDAO implements Mapear<ResultSet, Pr
         }
     }
     
-    public boolean actulizarEstado(Proyecto proyecto) throws SQLException{
+    public boolean actualizarEstado(Proyecto proyecto) throws SQLException{
         String sql = "UPDATE Proyectos SET estado = ? WHERE id = ?";
         try (
                 Connection con = obtenerConexion();
                 PreparedStatement ps = con.prepareStatement(sql)
             ){
-            ps.setString(1, proyecto.getNombre());
-            ps.setObject(2, proyecto.getEstado());
+            ps.setString(1, proyecto.getEstado().name());
+            ps.setInt(2, proyecto.getId());
             return ps.executeUpdate() == 1;
         }
     }
@@ -116,7 +142,4 @@ public class ProyectosDAO extends OperacionesDAO implements Mapear<ResultSet, Pr
                 Estado.valueOf(rs.getString("estado"))
         );
     }
-
-    
-    
 }

@@ -1,6 +1,7 @@
 package com.AlanGomez.gestion_proyectos_empresariales.modelo.clases;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class EmpleadoProyecto {
 
@@ -62,5 +63,18 @@ public class EmpleadoProyecto {
 
     public void setHorasSemanales(int horasSemanales) {
         this.horasSemanales = horasSemanales;
+    }
+
+    // La llave compuesta (empleado_id, proyecto_id) identifica la asignación
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EmpleadoProyecto otra)) return false;
+        return empleadoId == otra.empleadoId && proyectoId == otra.proyectoId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(empleadoId, proyectoId);
     }
 }

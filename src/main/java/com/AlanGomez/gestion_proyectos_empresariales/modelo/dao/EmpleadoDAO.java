@@ -24,7 +24,7 @@ public class EmpleadoDAO extends OperacionesDAO implements Mapear<ResultSet, Emp
     }
     
     public List<Empleado> listar() throws SQLException{
-        String sql = "SELECT nombre, correo FROM Empleados ORDER BY id";
+        String sql = "SELECT id, nombre, correo, cargo FROM Empleados ORDER BY id";
         List<Empleado> lista = new ArrayList<>();
         try (
                 Connection con = obtenerConexion();
@@ -39,28 +39,31 @@ public class EmpleadoDAO extends OperacionesDAO implements Mapear<ResultSet, Emp
     }
 
     public Empleado buscarPorId(int id) throws SQLException{
-        String sql = "SELECT * FROM Empleados WHERE id = ?";
+        String sql = "SELECT id, nombre, correo, cargo FROM Empleados WHERE id = ?";
         try (
                 Connection con = obtenerConexion();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()
+                PreparedStatement ps = con.prepareStatement(sql)
             ){
-            if (rs.next()){
-                return mapear(rs);
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    return mapear(rs);
+                }
+                return null;
             }
-            return null; 
         }
     }
     
     public boolean actualizarTodo(Empleado empleado) throws SQLException{
-        String sql = "UPDATE Empleados SET nombre = ?, correo = ? WHERE id = ?";
+        String sql = "UPDATE Empleados SET nombre = ?, correo = ?, cargo = ? WHERE id = ?";
         try(
                 Connection con = obtenerConexion();
                 PreparedStatement ps = con.prepareStatement(sql)
            ){
            ps.setString(1, empleado.getNombre());
            ps.setString(2, empleado.getCorreo());
-           ps.setInt(3, empleado.getId());
+           ps.setString(3, empleado.getCargo());
+           ps.setInt(4, empleado.getId());
            return ps.executeUpdate() == 1;
         }
     }

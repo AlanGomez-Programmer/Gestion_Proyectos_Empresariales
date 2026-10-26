@@ -18,7 +18,6 @@ public class Empleado {
     
     public Empleado(String nombre, String correo, String cargo){
         this(ID_SIN_ASIGNAR, nombre, correo, cargo);
-    
     }
     
     public Empleado(String nombre, String cargo){
@@ -45,6 +44,16 @@ public class Empleado {
     public String getCargo() {
         return cargo;
     }
-    
-    
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
 }

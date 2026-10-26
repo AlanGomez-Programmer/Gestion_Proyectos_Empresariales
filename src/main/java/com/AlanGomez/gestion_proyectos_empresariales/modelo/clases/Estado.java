@@ -2,11 +2,11 @@ package com.AlanGomez.gestion_proyectos_empresariales.modelo.clases;
 
 public enum Estado {
     
-    PLANIFICADO("PLANIFICADO"),
-    EN_CURSO("EN_CURSO"),
-    FINALIZADO("FINALIZADO");
+    PLANIFICADO("Planificado"),
+    EN_CURSO("En curso"),
+    FINALIZADO("Finalizado");
     
-    private String nombre;
+    private final String nombre;
     
     private Estado(String nombre){
         this.nombre = nombre;
@@ -15,6 +15,4 @@ public enum Estado {
     public String getNombre(){
         return nombre;
     }
-    
-    
 }

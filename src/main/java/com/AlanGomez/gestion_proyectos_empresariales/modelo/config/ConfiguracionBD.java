@@ -28,11 +28,11 @@ public record ConfiguracionBD (String url, String usuario, String contrasenia) {
         );
     }
     
-    public static String obtenerObligatoria(Properties propiedades, String clave){
+    private static String obtenerObligatoria(Properties propiedades, String clave){
         String valor = propiedades.getProperty(clave);
         if (valor == null || valor.isBlank()){
             throw new IllegalStateException(
-                    "Falta la clave" + valor + " en " + ARCHIVO_CONFIG
+                    "Falta la clave '" + clave + "' en " + ARCHIVO_CONFIG
             );
         }
         return valor.trim();

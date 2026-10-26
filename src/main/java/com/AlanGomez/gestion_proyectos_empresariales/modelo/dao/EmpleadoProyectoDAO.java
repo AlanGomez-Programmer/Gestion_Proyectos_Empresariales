@@ -6,16 +6,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class EmpleadoProyectoDAO extends OperacionesDAO implements Mapear<ResultSet, EmpleadoProyecto>{
     
     public boolean asignarProyecto(Empleado empleado, Proyecto proyecto, EmpleadoProyecto empleadoProyecto) throws SQLException{
-        String sql = """ 
+        String sql = """
             INSERT INTO Empleado_Proyecto(empleado_id, proyecto_id, rol, fecha_asignacion, horas_semanales)
             VALUES(?, ?, ?, ?, ?)
-        """;
+            """;
         try(
                 Connection con = obtenerConexion();
                 PreparedStatement ps = con.prepareStatement(sql)
@@ -28,44 +28,79 @@ public class EmpleadoProyectoDAO extends OperacionesDAO implements Mapear<Result
             return ps.executeUpdate() == 1;
         }
     }
+    
+    // Busca una asignación por su llave compuesta; devuelve null si no existe
+    public EmpleadoProyecto buscarAsignacion(int empleadoId, int proyectoId) throws SQLException{
+        String sql = """
+            SELECT empleado_id, proyecto_id, rol, fecha_asignacion, horas_semanales
+            FROM Empleado_Proyecto
+            WHERE empleado_id = ? AND proyecto_id = ?
+            """;
+        try(
+                Connection con = obtenerConexion();
+                PreparedStatement ps = con.prepareStatement(sql)
+           ){
+            ps.setInt(1, empleadoId);
+            ps.setInt(2, proyectoId);
+            try (ResultSet rs = ps.executeQuery()){
+                if (rs.next()){
+                    return mapear(rs);
+                }
+                return null;
+            }
+        }
+    }
  
-    public Map<EmpleadoProyecto, Empleado> listar(int id) throws SQLException{
+    // Integrantes de un proyecto: asignación -> empleado
+    public Map<EmpleadoProyecto, Empleado> listar(int proyectoId) throws SQLException{
         String sql = """
             SELECT EP.empleado_id, EP.proyecto_id, EP.rol, EP.fecha_asignacion, EP.horas_semanales,
                    E.nombre, E.cargo
             FROM Empleado_Proyecto EP
-            INNER JOIN Empleado E ON E.id = EP.empleado_id
+            INNER JOIN Empleados E ON E.id = EP.empleado_id
             WHERE EP.proyecto_id = ?
-        """;
-        Map<EmpleadoProyecto, Empleado> listas = new HashMap<>();
+            ORDER BY E.nombre
+            """;
+        Map<EmpleadoProyecto, Empleado> listas = new LinkedHashMap<>();
         try (
                 Connection con = obtenerConexion();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()
+                PreparedStatement ps = con.prepareStatement(sql)
             ){
-            ps.setInt(1, id);
-            while(rs.next()){
-                listas.put(mapear(rs), mapearEmpleado(rs));
+            ps.setInt(1, proyectoId);
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
+                    listas.put(mapear(rs), mapearEmpleado(rs));
+                }
             }
             return listas;
         }
     }
 
-    public Map<Empleado, EmpleadoProyecto> listarProyectos(int id) throws SQLException {
+    // Proyectos de un empleado: asignación -> proyecto
+    public Map<EmpleadoProyecto, Proyecto> listarProyectos(int empleadoId) throws SQLException {
         String sql = """
-            SELECT E.nombre, E.cargo, EP.nombre, EP.rol
+            SELECT EP.empleado_id, EP.proyecto_id, EP.rol, EP.fecha_asignacion, EP.horas_semanales,
+                   P.id           AS p_id,
+                   P.nombre       AS p_nombre,
+                   P.descripcion  AS p_descripcion,
+                   P.fecha_inicio AS p_fecha_inicio,
+                   P.fecha_fin    AS p_fecha_fin,
+                   P.estado       AS p_estado
             FROM Empleado_Proyecto EP
-            INNER JOIN Empleados E ON E.id = EP.id
-            WHERE E.id = ?
-        """;
-        Map<Empleado, EmpleadoProyecto> listas = new HashMap<>();
+            INNER JOIN Proyectos P ON P.id = EP.proyecto_id
+            WHERE EP.empleado_id = ?
+            ORDER BY P.nombre
+            """;
+        Map<EmpleadoProyecto, Proyecto> listas = new LinkedHashMap<>();
         try (
                 Connection con = obtenerConexion();
-                PreparedStatement ps = con.prepareStatement(sql);
-                ResultSet rs = ps.executeQuery()
+                PreparedStatement ps = con.prepareStatement(sql)
             ){
-            while(rs.next()){
-                listas.put(mapearEmpleado(rs), mapear(rs));
+            ps.setInt(1, empleadoId);
+            try (ResultSet rs = ps.executeQuery()){
+                while(rs.next()){
+                    listas.put(mapear(rs), mapearProyecto(rs));
+                }
             }
             return listas;
         }
@@ -74,11 +109,11 @@ public class EmpleadoProyectoDAO extends OperacionesDAO implements Mapear<Result
     public boolean actualizarAsignacion(EmpleadoProyecto empleadoProyecto) throws SQLException {
         String sql = """
             UPDATE Empleado_Proyecto SET rol = ?, horas_semanales = ?
-            WHERE empleado_id = ? AND proyecto_id = ?    
-        """;
+            WHERE empleado_id = ? AND proyecto_id = ?
+            """;
         try(
                 Connection con = obtenerConexion();
-                PreparedStatement ps = con.prepareStatement(sql);
+                PreparedStatement ps = con.prepareStatement(sql)
            ){
             ps.setString(1, empleadoProyecto.getRol());
             ps.setInt(2, empleadoProyecto.getHorasSemanales());
@@ -89,9 +124,7 @@ public class EmpleadoProyectoDAO extends OperacionesDAO implements Mapear<Result
     }
     
     public boolean eliminarEmpleadoAsignado(Empleado empleado, Proyecto proyecto) throws SQLException {
-        String sql = """
-            DELETE FROM Empleado_Proyecto WHERE empleado_id = ? AND empleado_id = ?;
-        """;
+        String sql = "DELETE FROM Empleado_Proyecto WHERE empleado_id = ? AND proyecto_id = ?";
         try(
                 Connection con = obtenerConexion();
                 PreparedStatement ps = con.prepareStatement(sql)
@@ -106,6 +139,17 @@ public class EmpleadoProyectoDAO extends OperacionesDAO implements Mapear<Result
         return new Empleado(
                 rs.getString("nombre"),
                 rs.getString("cargo")
+        );
+    }
+    
+    public Proyecto mapearProyecto(ResultSet rs) throws SQLException {
+        return new Proyecto(
+                rs.getInt("p_id"),
+                rs.getString("p_nombre"),
+                rs.getString("p_descripcion"),
+                rs.getObject("p_fecha_inicio", LocalDate.class),
+                rs.getObject("p_fecha_fin", LocalDate.class),
+                Estado.valueOf(rs.getString("p_estado"))
         );
     }
     
