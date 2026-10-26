@@ -9,21 +9,21 @@ public class Proyecto {
     private int id;
     private String nombre;
     private String descripcion;
-    private LocalDate fecha_inicio;
-    private LocalDate fecha_fin;
+    private LocalDate fechaInicio;
+    private LocalDate fechaFin;
     private Estado estado;
     
-    public Proyecto(int id, String nombre, String descripcion, LocalDate fecha_inicio, LocalDate fecha_fin, Estado estado){
+    public Proyecto(int id, String nombre, String descripcion, LocalDate fechaInicio, LocalDate fechaFin, Estado estado){
         this.id = id;
         this.nombre = nombre;
         this.descripcion = descripcion;
-        this.fecha_inicio = fecha_inicio;
-        this.fecha_fin = fecha_fin;
+        this.fechaInicio = fechaInicio;
+        this.fechaFin = fechaFin;
         this.estado = estado;
     }
     
-    public Proyecto(String nombre, String descripcion, LocalDate fecha_inicio, LocalDate fecha_fin, Estado estado){
-        this(ID_SIN_ASIGNAR, nombre, descripcion, fecha_inicio, fecha_fin, estado); 
+    public Proyecto(String nombre, String descripcion, LocalDate fechaInicio, LocalDate fechaFin, Estado estado){
+        this(ID_SIN_ASIGNAR, nombre, descripcion, fechaInicio, fechaFin, estado); 
     }
 
     public int getId() {
@@ -38,12 +38,12 @@ public class Proyecto {
         return descripcion;
     }
 
-    public LocalDate getFecha_inicio() {
-        return fecha_inicio;
+    public LocalDate getFechaInicio() {
+        return fechaInicio;
     }
 
-    public LocalDate getFecha_fin() {
-        return fecha_fin;
+    public LocalDate getFechaFin() {
+        return fechaFin;
     }
 
     public Estado getEstado() {
@@ -62,12 +62,12 @@ public class Proyecto {
         this.descripcion = descripcion;
     }
 
-    public void setFecha_inicio(LocalDate fecha_inicio) {
-        this.fecha_inicio = fecha_inicio;
+    public void setFechaInicio(LocalDate fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
 
-    public void setFecha_fin(LocalDate fecha_fin) {
-        this.fecha_fin = fecha_fin;
+    public void setFechaFin(LocalDate fechaFin) {
+        this.fechaFin = fechaFin;
     }
 
     public void setEstado(Estado estado) {
